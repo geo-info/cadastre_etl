@@ -1,4 +1,8 @@
-# PostGIS для cadastre-etl: `docker compose up -d postgis`.
+# cadastre-etl: `docker compose up -d` — PostGIS и сервис в режиме цикла.
+#
+#   docker compose up -d postgis             # только база, сервис — с хоста (uv run)
+#   docker compose run --rm etl run bep      # разовый прогон в контейнере
+#   docker compose --profile redis up -d     # плюс Redis под кэш НСПД (NSPD_CACHE=redis)
 #
 # Mongo здесь — только для локальной разработки, когда рядом нет Mongo
 # trading_platform: `docker compose --profile dev up -d`. В работе сервис читает
@@ -27,6 +31,39 @@ services:
       retries: 5
       start_period: 20s
 
+  etl:
+    build: .
+    container_name: cadastre-etl
+    restart: unless-stopped
+    depends_on:
+      postgis:
+        condition: service_healthy
+    # Сеть хоста: Mongo trading_platform (её compose публикует 127.0.0.1:27017) и
+    # PostGIS выше видны как localhost. Если Mongo на другой машине — задайте MONGO_URI.
+    network_mode: host
+    environment:
+      MONGO_URI: ${MONGO_URI:-mongodb://localhost:27017}
+      MONGO_DB: ${MONGO_DB:-trading}
+      POSTGRES_DSN: postgresql://etl:etl@localhost:5432/cadastre
+      NSPD_CACHE: ${NSPD_CACHE:-sqlite}
+      NSPD_REDIS_URL: redis://localhost:6379/0
+      NSPD_PROXY: ${NSPD_PROXY:-}
+      INTERVAL: ${INTERVAL:-30m}
+    volumes:
+      # Кэш ответов НСПД переживает пересборку контейнера.
+      - nspd-cache:/app/.cache
+
+  redis:
+    image: redis:7-alpine
+    container_name: cadastre-redis
+    profiles: ["redis"]
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis-data:/data
+
   mongo:
     image: mongo:8
     container_name: cadastre-mongo
@@ -46,3 +83,5 @@ services:
 volumes:
   pg-data:
   mongo-data:
+  nspd-cache:
+  redis-data:

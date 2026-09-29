@@ -39,7 +39,9 @@ EXIT_USAGE = 2
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="cadastre_etl", description=__doc__.splitlines()[0])
+    parser = argparse.ArgumentParser(
+        prog="cadastre_etl", description="Кадастровые объекты лотов: Mongo → НСПД → PostGIS."
+    )
     commands = parser.add_subparsers(dest="command", required=True)
     run = commands.add_parser("run", help="прогон площадок")
     run.add_argument("sources", nargs="*", help="имена площадок (коллекций); без имён — все")

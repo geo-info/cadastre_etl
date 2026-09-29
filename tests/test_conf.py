@@ -70,3 +70,8 @@ def test_неверный_вид_кэша(monkeypatch, tmp_path):
 def test_группы_собираются_вместе(monkeypatch):
     monkeypatch.setenv("MONGO_DB", "trading_x")
     assert Settings().mongo.db == "trading_x"
+
+
+def test_пустой_прокси_значит_без_прокси(monkeypatch, tmp_path):
+    monkeypatch.setenv("NSPD_PROXY", "")
+    assert NspdSettings(_env_file=tmp_path / "нет.env").proxy is None

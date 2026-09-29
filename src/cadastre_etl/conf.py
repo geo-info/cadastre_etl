@@ -120,6 +120,12 @@ class NspdSettings(BaseSettings):
     #: Срок жизни ответа в кэше — и «найдено», и «не найдено».
     cache_ttl: Duration = timedelta(days=7)
 
+    @field_validator("proxy", mode="before")
+    @classmethod
+    def _empty_proxy(cls, value: Any) -> Any:
+        """Пустая переменная (так её передаёт compose) — без прокси."""
+        return value or None
+
 
 class Settings(BaseModel):
     """Все настройки сервиса, по группам."""

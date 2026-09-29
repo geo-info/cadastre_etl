@@ -1,0 +1,519 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" dir="ltr" class="js gecko win cufon-active cufon-ready" lang="ru">
+<head>
+	<link rel="icon" type="image/png" href="https://rus-on.ru/inc/images/favicon.png">
+	<link rel="stylesheet" href="https://rus-on.ru/inc/css/style.css?v=11">
+
+	<title>
+		РОССИЯ ОнЛайн	</title>
+
+
+	<script src="https://rus-on.ru/inc/js/jquery-3.5.1.min.js"></script>
+	<script src="https://rus-on.ru/inc/js/script.js"></script>
+	<script src="https://rus-on.ru/inc/js/bootstrap.3.3.7.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<script src="https://rus-on.ru/inc/js/script.js"></script>
+	<script src="https://rus-on.ru/inc/js/jquery.datetimepicker.js"></script>
+	<link href="https://rus-on.ru/inc/css/jquery.datetimepicker.css" rel="stylesheet">
+	<link href="https://rus-on.ru/inc/css/fontawesome.css" rel="stylesheet">
+
+	<script>
+		function redirector(new_url) {
+			window.location.href=new_url;
+		}
+	</script>
+
+	<script>
+		function table_shower(id) {
+			table_id="#"+id;
+			$(table_id).toggleClass('collapse');
+		}
+	</script>
+	</head>
+<body class="front not-logged-in page-auctions one-sidebar sidebar-left lightbox-processed">
+<input type="hidden" size="20" name="tempclock" id="tempclock">
+<div id="art-main">
+	<div class="art-sheet">
+		<div class="art-sheet-cc"></div>
+		<div class="art-sheet-body">
+			<div class="art-header">
+				<table>
+					<tr style="height:120px;">
+						<td id="top_logo">
+							<a class="d-none d-lg-block" href="https://rus-on.ru/">
+								<img src="data:image/png;base64,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" alt="Логотип">
+							</a>
+						</td>
+						<td id="top_header">Электронная площадка для совершения юридически значимых действий</td>
+						<td id="top_phones"><span class="fa fa-phone"></span> 8(800) 505-39-63 <br>
+						(c 09 до 21 МСК) <br>rus-on@rus-on.ru</td>
+					</tr>
+				</table>
+			</div>
+			<div id="top_menu">
+				<ul class='top_menu'><li class='top_menu_item item-1  active'><a class='btn-topmenu btn-success' href='https://rus-on.ru/bankrot/trade_list.php' title='Торги в банкротстве'>Торги в банкротстве</a></li> <li class='top_menu_item item-2 '><a class='btn-topmenu btn-success' href='https://rus-on.ru/common/page.php?id=27' title='Коммерческие торги'>Коммерческие торги</a></li> <li class='top_menu_item item-3 '><a class='btn-topmenu btn-success' href='https://rus-on.ru/common/page.php?id=24' title='Подключение к системе'>Подключение к системе</a></li> <li class='top_menu_item item-4 '><a class='btn-topmenu btn-success' href='https://rus-on.ru/common/page.php?id=20' title='Тарифы'>Тарифы</a></li> <li class='top_menu_item item-5 '><a class='btn-topmenu btn-success' href='https://rus-on.ru/common/page.php?id=26' title='Контакты и реквизиты'>Контакты и реквизиты</a></li> </ul>			</div>
+			<div class="art-content-layout">
+				<div class="art-content-layout-row">
+					<div class="art-layout-cell art-sidebar1" id="art-sidebar1">
+
+						<div>
+							<div class="block_header clock-block">
+								<div class="clock-date">27.09.2026 10:42</div>
+								<sup>(время московское)</sup>
+							</div>
+						</div>
+
+						<div>
+<!--							Форма авторизации либо личный кабинет-->
+								<div class="block_header">Вход в систему</div>
+<div class="block_content">
+	<form action="https://rus-on.ru/common/login.php" accept-charset="UTF-8" method="post" id="form_login">
+		<label for="InputEmail">E-mail</label>
+		<input type="text" class="form-control" id="InputEmail" placeholder="Введите email" name="user_mail">
+		<label for="InputPassword">Пароль</label>
+		<div class="input-group">
+			<input type="password" class="form-control" id="InputPassword" placeholder="Введите пароль" name="user_password">
+			<a id="passwd_changer" class="far fa-eye" onclick="change_passwd_fieldtype();"></a>
+		</div>
+		<input type="hidden" name="form_id" value="user_login">
+		<br>
+		<input type="submit" name="op" value="Вход" class="btn btn-success btn-block">
+		<a href="https://rus-on.ru/common/reg.php" title="Создать новую учетную запись пользователя" class="btn btn-success btn-block">Регистрация</a>
+		<a href="https://rus-on.ru/common/passwd_remainer.php" title="Запросить новый пароль по электронной почте" class="btn btn-success btn-block">Забыли пароль?</a>
+	</form>
+</div>
+<script>
+	function change_passwd_fieldtype() {
+		if ($("#InputPassword").attr('type') == 'password') {
+			$("#InputPassword").attr('type', 'text');
+		} else {
+			$("#InputPassword").attr('type', 'password');
+		}
+	}
+</script>
+						</div>
+
+						<div>
+								
+				<div class='block_header'>Справочная информация</div>
+				<div class='block_content' style='text-align:center;'>
+					<ul class='sidebar_menu'><li class='item-2'><a href='https://rus-on.ru/common/instructions.php?id=1'>Инструкции</a></li><li class='item-2'><a href='https://rus-on.ru/stat/ecp_check.php'>Проверка ЭЦП</a></li><li class='item-2'><a href='https://rus-on.ru/common/page.php?id=18'>Удостоверяющие центры</a></li><li class='item-2'><a href='https://rus-on.ru/common/page.php?id=19'>Реклама торгов</a></li><li class='item-2'><a href='https://rus-on.ru/common/page.php?id=20'>Тарифы</a></li><li class='item-2'><a href='https://rus-on.ru/common/page.php?id=21'>Получить ЭЦП</a></li><li class='item-2'><a href='https://rus-on.ru/common/page.php?id=22'>Законодательство</a></li><li class='item-2'><a href='https://rus-on.ru/common/page.php?id=23'>Регламент и договор</a></li><li class='item-2'><a href='https://rus-on.ru/common/page.php?id=24'>Подключение к системе</a></li><li class='item-2'><a href='https://rus-on.ru/common/page.php?id=25'>Центр поддержки пользователей</a></li><li class='item-2'><a href='https://rus-on.ru/common/page.php?id=26'>Контакты и реквизиты</a></li></ul></div>
+				<div class='block_header'>Ускоренная регистрация на ЭТП</div>
+				<div class='block_content' style='text-align:center;'>
+					<ul class='sidebar_menu'><li class='item-2'><a href='https://rus-on.ru/common/page.php?id=27'>Тарифы на ускоренную аккредитацию на ЭТП</a></li></ul></div>								<div class='block_content' style='text-align:center;'>
+								<!--<a href="https://investtorgi.ru/services/?utm_source=ruson&utm_medium=banner&utm_campaign=bannerruson" target="_blank">
+									<img src="https://rus-on.ru/inc/images/banners/new2-2.gif" width="235" height="430">
+								</a>-->
+								<a href="http://а-банкрот.рф/?utm_medium=banner&utm_term=rus-on_890%2A1692/" target="_blank">
+									<img src="https://rus-on.ru/inc/images/banners/iptischenko.gif" width="235" height="430">
+								</a>
+								</div>
+						</div>
+
+						<div class="art-block clear-block block block-menu" id="block-menu-menu-left-menu">
+							<div class="art-block-body">
+								<div class="art-blockcontent content">
+									<div class="art-blockcontent-body block_menu">
+
+									</div>
+								</div>
+							</div>
+							<div class="art-block-body">
+								<div class="art-blockcontent content">
+																	</div>
+							</div>
+						</div>
+					</div>
+					<div class="content">
+							<div class='title-bg' id='nameSection'>Торги в банкротстве</div>	<div class='sectionDesc' id='sectionDesc'>Секция многофункциональной электронной торговой площадки предназначенная для проведения торгов в электронной форме при продаже имущества должников в соответствии с 127-ФЗ 'О несостоятельности (банкротстве)'</div>
+<h1 class='node_header'>Реестр торгов</h1>
+<form action='' method='GET' id='tradesearch'>
+<table class='table_search'>
+<tbody>
+<!--		<tr>
+			<td>Предмет торгов</td>
+			<td><input class='form-control' id='' placeholder='' type='text'></td>
+		</tr>-->
+		<tr>
+		<th colspan='2' class='search_header'>Поиск </th>
+		</tr>
+		<tr>
+			<td class='search_label'>Номер торгов</td>
+			<td><input class='form-control search_full' id='' placeholder='' type='text' name='trade_number'></td>
+		</tr>
+		<tr>
+			<td class='search_label'>Предмет торгов</td>
+			<td><input class='form-control search_full' id='' placeholder='' type='text' name='lot_goods'></td>
+		</tr>
+		<tr>
+			<td class='search_label'>Должник</td>
+			<td><input class='form-control search_full' id='' placeholder='Наименование, фамилия, инн, огрн' type='text' name='debtor_info'></td>
+		</tr>
+		<tr>
+			<td class='search_label'>Организатор торгов</td>
+			<td><input class='form-control search_full' id='' placeholder='Наименование, фамилия, инн, огрн' type='text' name='org_info'></td>
+		</tr>
+		<tr>
+			<td class='search_label'>Арбитражный управляющий</td>
+			<td><input class='form-control search_full' id='' placeholder='Фамилия, имя, инн' type='text'  name='arbitr_info'></td>
+		</tr>
+		<tr>
+			<td class='search_label'>Дата начала приема заявок</td>
+			<td>
+				<input class='form-control search_short' id='' placeholder='С' type='datetime_short' name='app_start_from'>&nbsp;&nbsp;&nbsp;
+				<input class='form-control search_short' id='' placeholder='ПО' type='datetime_short' name='app_start_to'>
+
+			</td>
+		</tr>
+		<tr>
+			<td class='search_label'>Дата окончания приема заявок</td>
+			<td>
+				<input class='form-control search_short' id='' placeholder='С' type='datetime_short' name='app_end_from'>&nbsp;&nbsp;&nbsp;
+				<input class='form-control search_short' id='' placeholder='ПО' type='datetime_short' name='app_end_to'>
+
+			</td>
+		</tr>
+		<tr>
+			<td class='search_label'>Способ торгов</td>
+			<td>
+				<select class='form-control search_full' id='t1-5' name='trade_type'><option>Любой</option><option>Аукцион с открытой формой представления цены</option><option>Аукцион с закрытой формой представления цены</option><option>Конкурс с открытой формой представления цены</option><option>Конкурс с закрытой формой представления цены</option><option>Публичное предложение</option><option>Закрытый аукцион с открытой формой представления цены</option><option>Закрытый аукцион с закрытой формой представления цены</option><option>Закрытый конкурс с открытой формой представления цены</option><option>Закрытый конкурс с закрытой формой представления цены</option><option>Закрытое публичное предложение</option></select>
+			</td>
+		</tr>
+		<tr>
+			<td class='search_label'>Состояние</td>
+			<td>
+				<select class='form-control search_full' id='t1-5' name='trade_state'><option>Любой</option><option>Торги объявлены</option><option>Прием заявок</option><option>Прием заявок завершен</option><option>Идут торги</option><option>Подведение итогов</option><option>Торги завершены</option><option>Торги не состоялись</option><option>Торги приостановлены</option><option>Торги отменены</option></select>
+
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>
+			<button type='submit' class='btn btn-success'>Поиск</button>
+			<button type='button' class='btn btn-success' onclick='tradelist_reload()'>Очистить</button>
+			</td>
+		</tr>
+</tbody>
+</table>
+<input type='hidden' name='pagenum' id='pagenum'>
+</form>
+
+<header style='position:relative;'>
+	<nav class='pagnav' aria-label='Постраничная навигация'>
+		<div class='header' >Страница:</div>
+		<ul class='pagination'><li class='active'><a onclick='pagenum_send(1)'>1</a></li><li><a onclick='pagenum_send(2)'>2</a></li><li><a onclick='pagenum_send(3)'>3</a></li><li><a onclick='pagenum_send(4)'>4</a></li><li><a onclick='pagenum_send(5)'>5</a></li><li><a onclick='pagenum_send(6)'>6</a></li><li><a onclick='pagenum_send(7)'>7</a></li><li><a onclick='pagenum_send(8)'>8</a></li><li><a onclick='pagenum_send(9)'>9</a></li><li><a onclick='pagenum_send(10)'>10</a></li></ul></nav></header>
+<table class='node_view'>
+	<thead>
+		<tr>
+		<th>Номер торгов</th>
+		<th>Предмет торгов</th>
+		<th>Организатор</th>
+		<th>Должник</th>
+		<th>Начало приема заявок</th>
+		<th>Окончание приема заявок</th>
+		<th>Текущий статус</th>
+		</tr>
+	</thead><tbody><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114310'>14403-ОТПП<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114311'><b>Лот № 1</b><br>транспортное средство: Volkswagen Polo,Идентификационный номер (VIN номер): XW8ZZZ61ZLG047202, Год выпуска: 2020 гос.номер Р213УН196. Объект в залоге. Залог в пользу АО ТБАНК.</a>
+		</td>
+		<td>Третьякова Галина Анатольевна</td>
+		<td>Болотов Александр Александрович</td>
+		<td style='white-space:nowrap;'>26.09.2026 12:00</td>
+		<td style='white-space:nowrap;'>11.10.2026 12:00</td>
+		<td>Прием заявок</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114308'>14402-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114309'><b>Лот № 1</b><br>Индивидуальный жилой дом, площадь 325,1 кв.м., кадастровый номер 48:20:0011314:218, и земельный участок, площадь 783 кв.м., кадастровый номер 48:20:0011314:2, расположенные по адресу: Липецкая область, г. Липецк, ул. Рябиновая, д. 4</a>
+		</td>
+		<td>Базоев Вадим Владимирович</td>
+		<td>Викулин Евгений Евгеньевич</td>
+		<td style='white-space:nowrap;'>28.09.2026 10:00</td>
+		<td style='white-space:nowrap;'>03.11.2026 23:59</td>
+		<td>Торги объявлены</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114295'>14400-ОТПП<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114296'><b>Лот № 1</b><br>Право требование по ДДУ на квартиру 23, проектной площадью 80.08 кв.м. в 42-х квартирном доме стр.№ 20(7-ая очередь I этапа строительства микрорайона Новый Ярославль), строящемся на земельном участке общ. площадью 1 188 157 кв.м., (кадастровый № 76:17:204401:372) расположенном по адрес: Ярославская область, Ярославский район, Бекреневский с/с, д. Губцево.
+Залог у ПАО «Банк ПСБ».</a>
+		</td>
+		<td>Жуков Михаил Николаевич</td>
+		<td>Катышева Мария Владимировна</td>
+		<td style='white-space:nowrap;'>26.10.2026 10:00</td>
+		<td style='white-space:nowrap;'>29.11.2026 10:00</td>
+		<td>Торги объявлены</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114290'>14399-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114291'><b>Лот № 1</b><br>автомобиль легковой, 2014 года выпуска, модель Ниссан Сентра, г.р.з. В668МУ142, регистрационный номер (VIN) Z8NBEAB1752071894</a>
+		</td>
+		<td>Литвинова Оксана Валерьевна</td>
+		<td>Теплова Алена Юрьевна</td>
+		<td style='white-space:nowrap;'>28.09.2026 00:00</td>
+		<td style='white-space:nowrap;'>30.10.2026 23:59</td>
+		<td>Торги объявлены</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114286'>14398-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114287'><b>Лот № 1</b><br>Квартира, площадью 31,7 кв.м., кадастровый номер 47:07:0722001:127617, расположенная по адресу: Ленинградская область, Всеволожский муниципальный район, Муринское городское поселение, город Мурино, проспект Авиаторов Балтики, д.25, кв.208</a>
+		</td>
+		<td>Григорьева Наталья Васильевна</td>
+		<td>Молотовникова Анна Вадимовна</td>
+		<td style='white-space:nowrap;'>25.09.2026 11:00</td>
+		<td style='white-space:nowrap;'>02.11.2026 11:00</td>
+		<td>Прием заявок</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114283'>14397-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114284'><b>Лот № 1</b><br>Транспортное средство KIA RIO, 2013 г.вып., цвет серый, объем двигателя 1591 куб. см., мощность 123 л.с. идентификационный номер (VIN) Z94CC51BBDRO8646</a>
+		</td>
+		<td>Базоев Вадим Владимирович</td>
+		<td>Орехов Юрий Михайлович</td>
+		<td style='white-space:nowrap;'>28.09.2026 09:00</td>
+		<td style='white-space:nowrap;'>30.10.2026 17:00</td>
+		<td>Торги объявлены</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114271'>14395-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114272'><b>Лот № 1</b><br>транспортное средство – легковой автомобиль, марка /модель – BMW 528i,  год выпуска – 2011,   VIN – X4XFR15400C486540, гос.номер – Т616РН05.</a>
+		</td>
+		<td>Багамаев Набибула Курбанович</td>
+		<td>Гамидова Асият Гаджимагомедовна</td>
+		<td style='white-space:nowrap;'>28.09.2026 09:00</td>
+		<td style='white-space:nowrap;'>30.10.2026 18:00</td>
+		<td>Торги объявлены</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114266'>14393-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114267'><b>Лот № 1</b><br>Квартира, назначение: жилое, кадастровый (условный) номер: 21:01:030110:394, адрес (местонахождение): 428022, Россия, Чувашская Республика - Чувашия, г Чебоксары, ул Цивильская, д 17, кв 38, вид собственности: Долевая, 1/4 Доли в праве собственности. Объект в залоге. Залогодержатель АО ТБАНК.</a>
+		</td>
+		<td>Бавин Антон Николаевич</td>
+		<td>Бурлова Гюзель Фаттаховна</td>
+		<td style='white-space:nowrap;'>28.09.2026 10:00</td>
+		<td style='white-space:nowrap;'>03.11.2026 14:00</td>
+		<td>Торги объявлены</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114264'>14392-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114265'><b>Лот № 1</b><br>Земельный участок, площадью 901 +/- 11 кв. м. Категория / ВРИ – Земли СХН / Для ведения дачного хозяйства. Адрес: Ленинградская область, м.р-н Выборгский, Полянское сельское поселение, территория Полянское, пос. Уткино, участок 697. Кадастровый номер: 47:01:1629001:10697.
+Здание, назначение: жилой дом, площадью 108,6 кв. м., количество этажей: 1, в том числе подземных 0. Адрес: РФ, Ленинградская область, м.р-н Выборгский, Полянское сельское поселение, территория Полянское, пос. Уткино, д. 697. Кадастровый № 47:01:1629001:11446.</a>
+		</td>
+		<td>Кируша Михаил Андреевич</td>
+		<td>Исмаилов Бахтияр Октай оглы</td>
+		<td style='white-space:nowrap;'>28.09.2026 10:00</td>
+		<td style='white-space:nowrap;'>26.10.2026 10:00</td>
+		<td>Торги объявлены</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114255'>14391-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114256'><b>Лот № 1</b><br>Предприятие ООО «ВЕЛИКОЛЕНСКОЕ» (ИНН: 5940508995, ОГРН: 1025901892455, адрес: 617452, Пермский край, Кунгурский район, с. Ленcк, ул. Ленина, д.37) как имущественный  комплекс: все виды имущества, предназначенного для осуществления предпринимательской деятельности, в том числе земельные участки, здания, строения, сооружения, оборудование, инвентарь, сырье, продукция, права требования, права на средства индивидуализации (товарный знак), за исключением текущих обязательств, то есть обязательств которые возникли после принятия заявления о признании ООО «Великоленское» банкротом</a>
+		</td>
+		<td>Клыков Сергей Александрович</td>
+		<td>ООО «ВЕЛИКОЛЕНСКОЕ»</td>
+		<td style='white-space:nowrap;'>23.09.2026 06:00</td>
+		<td style='white-space:nowrap;'>30.10.2026 06:00</td>
+		<td>Прием заявок</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114249'>14390-ОТПП<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114251'><b>Лот № 1</b><br>земельный участок по адресу: Клинский, городское поселение Клин, с. Борщево. Земельный участок расположен в западной части кадастрового квартала пл. 1 275 кв.м., кадастровый номер 50:03:0030280:2010, категория/ВРИ–ЗСН/ЛПХ.</a>
+		</td>
+		<td>Павлова Виктория Вадимовна</td>
+		<td>Расулов Мехман Аслан оглы</td>
+		<td style='white-space:nowrap;'>02.11.2026 09:00</td>
+		<td style='white-space:nowrap;'>20.12.2026 18:00</td>
+		<td>Торги объявлены</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114248'>14389-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114252'><b>Лот № 2</b><br>Транспортное средство BMW X6 XDRIVE40I,  гос. номер Т707ЕС777, VIN  WBACY610109E66278, год выпуска 2020</a>
+		</td>
+		<td>Швецов Алексей Викторович</td>
+		<td>общество с ограниченной ответственностью Транспортная компания ТСС</td>
+		<td style='white-space:nowrap;'>28.09.2026 09:00</td>
+		<td style='white-space:nowrap;'>02.11.2026 16:00</td>
+		<td>Торги объявлены</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114248'>14389-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114250'><b>Лот № 1</b><br>Транспортное средство HYUNDAI SOLARIS, гос. номер О954НН40, VIN Z94K241CBKR100759, год выпуска 2018г.</a>
+		</td>
+		<td>Швецов Алексей Викторович</td>
+		<td>общество с ограниченной ответственностью Транспортная компания ТСС</td>
+		<td style='white-space:nowrap;'>28.09.2026 09:00</td>
+		<td style='white-space:nowrap;'>02.11.2026 16:00</td>
+		<td>Торги объявлены</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114240'>14388-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114241'><b>Лот № 1</b><br>Легковой автомобиль, марка, модель: РЕНО ЛОГАН (RENAULT LOGAN), год выпуска 2011, категория ТС Легковой универсал, VIN-номер VF1KSREKJ45270368, номер кузова VF1KSREKJ45270368, модель двигателя не указана, мощность двигателя, кВт/л.с. 51.5/70, цвет кузова СИНИЙ.</a>
+		</td>
+		<td>Морланг Ирина Николаевна</td>
+		<td>Горный Дмитрий Владимирович</td>
+		<td style='white-space:nowrap;'>25.09.2026 10:00</td>
+		<td style='white-space:nowrap;'>29.10.2026 10:00</td>
+		<td>Прием заявок</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114228'>14385-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114229'><b>Лот № 1</b><br>Земельный участок,площадью:596кв.м.,с кадастровымномером:26:27:062601:273,расположенныйпо адресу: Российская Федерация, Ставропольский край,р-н Советский,г.Зеленокумск,проездСадовый4,45</a>
+		</td>
+		<td>Багамаев Набибула Курбанович</td>
+		<td>Шамхалов Габибулла Шамхалович</td>
+		<td style='white-space:nowrap;'>25.09.2026 09:00</td>
+		<td style='white-space:nowrap;'>29.10.2026 18:00</td>
+		<td>Прием заявок</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114222'>14384-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114223'><b>Лот № 1</b><br>1/3 доля здания площадью 43,2 кв. м, назначение: жилой дом, этаж: 1, кадастровый номер: 36:20:0700001:77, адрес (местонахождение) объекта: Российская Федерация, Воронежская область, Павловский район, с. Бабка, ул. Первомайская, д. 43, и 1/3 доля земельного участка, площадь 3600 кв. м, адрес: Российская Федерация, Воронежская область, Павловский район, с. Бабка, ул. Первомайская, 43, кадастровый номер: 36:20:0700001:26, вид разрешенного использования: для ведения личного подсобного хозяйства, категория земель: земли населенных пунктов</a>
+		</td>
+		<td>Лучникова Оксана Юрьевна</td>
+		<td>Лахина Наталья Анатольевна</td>
+		<td style='white-space:nowrap;'>22.09.2026 10:00</td>
+		<td style='white-space:nowrap;'>16.10.2026 14:00</td>
+		<td>Прием заявок</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114213'>14383-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114214'><b>Лот № 1</b><br>этаж: 1, кадастровый номер: 36:06:0100026:417</a>
+		</td>
+		<td>Лучникова Оксана Юрьевна</td>
+		<td>Неповинных Лилия Ваитовна</td>
+		<td style='white-space:nowrap;'>22.09.2026 10:00</td>
+		<td style='white-space:nowrap;'>16.10.2026 14:00</td>
+		<td>Прием заявок</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114211'>14382-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114212'><b>Лот № 1</b><br>Идентификационный номер (VIN номер): XW8ZZZ61ZKG027298, год выпуска: 2018.</a>
+		</td>
+		<td>Кируша Михаил Андреевич</td>
+		<td>Евдокимова Карина Владимировна</td>
+		<td style='white-space:nowrap;'>25.09.2026 10:00</td>
+		<td style='white-space:nowrap;'>23.10.2026 10:00</td>
+		<td>Прием заявок</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114206'>14381-ОТПП<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114207'><b>Лот № 1</b><br>Земельный участок площадью 1 899 м2, с кадастровым номером 16:33:190201:25, с одноэтажным Жилым домом площадью 65,1 м2, с кадастровым номером 16:33:190201:328, расположенные по адресу: Республика Татарстан, Пестречинский муниципальный район, деревня Толкияз, улица Кооперативная, дом 35.</a>
+		</td>
+		<td>Бикбаева Роксана Рафаэлевна</td>
+		<td>Гайнутдинова Зарина Вячеславовна</td>
+		<td style='white-space:nowrap;'>25.09.2026 09:00</td>
+		<td style='white-space:nowrap;'>13.11.2026 09:00</td>
+		<td>Прием заявок</td>
+	</tr><tr>
+		<td nowrap>
+			<a href='https://rus-on.ru/bankrot/trade_view.php?trade_nid=114194'>14380-ОАОФ<br>(Торги)</a>
+		</td>
+		<td>
+			<a href='https://rus-on.ru/bankrot/lot_view.php?lot_nid=114196'><b>Лот № 2</b><br>автомобиль легковой SUBARU FORESTER, 2002 года выпуска, идентификационный номер (VIN) – отсутствует, модель и номер двига-теля EJ20-B575665, номер кузова SG5-012913, цвет кузова – белый, государственный регистрационный знак Х527МР124</a>
+		</td>
+		<td>Литвинова Оксана Валерьевна</td>
+		<td>Пакарев Виталий Андреевич</td>
+		<td style='white-space:nowrap;'>20.09.2026 00:00</td>
+		<td style='white-space:nowrap;'>27.10.2026 23:59</td>
+		<td>Прием заявок</td>
+	</tr></tbody></table>
+<header style='position:relative;'>
+	<nav class='pagnav' aria-label='Постраничная навигация'>
+		<div class='header' >Страница:</div>
+		<ul class='pagination'><li class='active'><a onclick='pagenum_send(1)'>1</a></li><li><a onclick='pagenum_send(2)'>2</a></li><li><a onclick='pagenum_send(3)'>3</a></li><li><a onclick='pagenum_send(4)'>4</a></li><li><a onclick='pagenum_send(5)'>5</a></li><li><a onclick='pagenum_send(6)'>6</a></li><li><a onclick='pagenum_send(7)'>7</a></li><li><a onclick='pagenum_send(8)'>8</a></li><li><a onclick='pagenum_send(9)'>9</a></li><li><a onclick='pagenum_send(10)'>10</a></li></ul></nav></header>					</div>
+				</div>
+			</div>
+			<div class="cleared"></div>
+			<div class="art-footer">
+				<div class="art-footer-t"></div>
+				<div class="art-footer-b"></div>
+				<div class="art-footer-body">
+					<div class="art-footer-text">
+						Руссиа Онлайн
+						<div class='active_users'>
+													</div>
+					</div>
+					<div class="cleared"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="cleared"></div>
+	<p class="art-page-footer"></p>
+</div>
+<div id="lightbox2-overlay" style="display: none;"></div>
+<div id="lightbox" style="display: none;" class="lightbox2-orig-layout">
+	<div id="outerImageContainer" style="background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);">
+		<div id="modalContainer" style="display: none; padding: 10px;"></div>
+		<div id="frameContainer" style="display: none; padding: 10px;"></div>
+		<div id="imageContainer" style="display: none; padding: 10px;">
+			<img id="lightboxImage" alt="">
+			<div id="hoverNav"><a id="prevLink" title="Предыдущий" href="#" style="padding-top: 10px;"></a><a id="nextLink" title="Далее" href="#" style="padding-top: 10px;"></a></div>
+		</div>
+		<div id="loading"><a href="#" id="loadingLink"></a></div>
+	</div>
+	<div id="imageDataContainer" class="clearfix" style="background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);">
+		<div id="imageData">
+			<div id="imageDetails"><span id="caption"></span><span id="numberDisplay"></span></div>
+			<div id="bottomNav">
+				<div id="frameHoverNav"><a id="framePrevLink" title="Предыдущий" href="#" style="padding-top: 10px;"></a><a id="frameNextLink" title="Далее" href="#" style="padding-top: 10px;"></a></div>
+				<a id="bottomNavClose" title="Закрыть" href="#" style="background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);"></a><a id="bottomNavZoom" href="#"></a><a id="bottomNavZoomOut" href="#"></a><a id="lightshowPause" title="Pause Slideshow" href="#" style="display: none;"></a><a id="lightshowPlay" title="Play Slideshow" href="#" style="display: none;"></a>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html><script>
+    function pagenum_send(pagenum) {
+        $("#pagenum").val(pagenum);
+        $("#tradesearch").submit();
+
+    }
+
+    function tradelist_reload() {
+        window.location = 'https://rus-on.ru/bankrot/trade_list.php';
+    }
+</script>
+<script>
+    $('input[type=datetime_full]').datetimepicker({dayOfWeekStart: 1, format: 'd.m.Y H:i', lang: 'ru'});
+    $('input[type=datetime_short]').datetimepicker({timepicker: false, dayOfWeekStart: 1, format: 'd.m.Y', lang: 'ru'});
+</script>
+

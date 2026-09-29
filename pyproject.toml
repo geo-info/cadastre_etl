@@ -1,0 +1,62 @@
+[project]
+name = "cadastre-etl"
+version = "0.1.0"
+description = "Кадастровые объекты лотов trading_platform: из Mongo через НСПД в PostGIS"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiolimiter>=1.2",
+    "psycopg[binary]>=3.2",
+    "psycopg-pool>=3.2",
+    "pydantic>=2.10",
+    "pydantic-settings>=2.7",
+    "pymongo>=4.9",
+    # 1.1.x: опираемся на AsyncNspd.request, pynspd.schemas и хранилища hishel 0.1 —
+    # см. «Что проверено по исходникам» в спеке. Новую минорную версию — только
+    # после сверки этих мест.
+    "pynspd[redis,sqlite]>=1.1.15,<1.2",
+    "shapely>=2.0",
+]
+
+[project.scripts]
+cadastre-etl = "cadastre_etl.__main__:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "pytest-httpx>=0.35",
+    "ruff>=0.9",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cadastre_etl"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+src = ["src"]
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["cadastre_etl"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "-m 'not live'"
+markers = [
+    "mongo: нужна запущенная Mongo (MONGO_URI); без неё — skip, с REQUIRE_MONGO=1 — ошибка",
+    "postgres: нужен запущенный PostGIS (POSTGRES_DSN); без него — skip, с REQUIRE_POSTGRES=1 — ошибка",
+    "live: ходит в настоящий НСПД; в CI не запускается, вручную — pytest -m live",
+]

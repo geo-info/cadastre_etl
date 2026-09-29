@@ -1,0 +1,66 @@
+{
+ "data": {
+  "type": "FeatureCollection",
+  "features": [
+   {
+    "id": 38005,
+    "type": "Feature",
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        4187839.244,
+        7512764.748
+       ],
+       [
+        4187861.508,
+        7512764.748
+       ],
+       [
+        4187861.508,
+        7512804.327
+       ],
+       [
+        4187839.244,
+        7512804.327
+       ],
+       [
+        4187839.244,
+        7512764.748
+       ]
+      ]
+     ],
+     "crs": {
+      "type": "name",
+      "properties": {
+       "name": "EPSG:3857"
+      }
+     }
+    },
+    "properties": {
+     "category": 36369,
+     "categoryName": "Здания",
+     "options": {
+      "build_record_type_value": "Здание",
+      "cad_num": "77:01:0001001:1024",
+      "readable_address": "г. Москва",
+      "children": "77:01:0001001:9999"
+     },
+     "systemInfo": {
+      "inserted": "2024-01-01T00:00:00",
+      "insertedBy": "nspd",
+      "updated": "2026-09-01T00:00:00",
+      "updatedBy": "nspd"
+     }
+    }
+   }
+  ]
+ },
+ "meta": [
+  {
+   "totalCount": 1,
+   "categoryId": 36369
+  }
+ ]
+}

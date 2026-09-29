@@ -1,0 +1,54 @@
+{
+ "data": {
+  "type": "FeatureCollection",
+  "features": [
+   {
+    "id": 38003,
+    "type": "Feature",
+    "geometry": {
+     "type": "Point",
+     "coordinates": [
+      4230140.65,
+      7459516.941
+     ],
+     "crs": {
+      "type": "name",
+      "properties": {
+       "name": "EPSG:3857"
+      }
+     }
+    },
+    "properties": {
+     "category": 36383,
+     "categoryName": "Сооружения",
+     "options": {
+      "object_type_value": "Сооружение",
+      "registration_date": "10.10.2015",
+      "cad_number": "50:23:0000000:4567",
+      "quarter_cad_number": "50:23:0000000",
+      "address_readable_address": "Московская область, Раменский г.о.",
+      "params_name": "Газопровод",
+      "params_purpose": "Линейное сооружение",
+      "params_extension": 1200.0,
+      "params_area": null,
+      "params_built_up_area": 35.0,
+      "object_previously_posted": "Учтенный",
+      "cost_value": 900000.0
+     },
+     "systemInfo": {
+      "inserted": "2024-01-01T00:00:00",
+      "insertedBy": "nspd",
+      "updated": "2026-09-01T00:00:00",
+      "updatedBy": "nspd"
+     }
+    }
+   }
+  ]
+ },
+ "meta": [
+  {
+   "totalCount": 1,
+   "categoryId": 36383
+  }
+ ]
+}

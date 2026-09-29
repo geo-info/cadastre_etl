@@ -1,0 +1,53 @@
+{
+ "data": {
+  "type": "FeatureCollection",
+  "features": [
+   {
+    "id": 38004,
+    "type": "Feature",
+    "geometry": {
+     "type": "Point",
+     "coordinates": [
+      4187839.244,
+      7512764.748
+     ],
+     "crs": {
+      "type": "name",
+      "properties": {
+       "name": "EPSG:3857"
+      }
+     }
+    },
+    "properties": {
+     "category": 36453,
+     "categoryName": "Помещения",
+     "options": {
+      "geocoderObject": true,
+      "objdocId": 111,
+      "registersId": 36453,
+      "cad_num": "77:01:0001001:2345",
+      "type": "Помещение",
+      "params_type": "Квартира",
+      "area": 53.9,
+      "readable_address": "г. Москва, ул. Примерная, д. 1, кв. 5",
+      "cost_value": 12000000.0,
+      "status": "Учтенный",
+      "parent_cad_number": "77:01:0001001:1024"
+     },
+     "systemInfo": {
+      "inserted": "2024-01-01T00:00:00",
+      "insertedBy": "nspd",
+      "updated": "2026-09-01T00:00:00",
+      "updatedBy": "nspd"
+     }
+    }
+   }
+  ]
+ },
+ "meta": [
+  {
+   "totalCount": 1,
+   "categoryId": 36453
+  }
+ ]
+}

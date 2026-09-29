@@ -1,0 +1,77 @@
+{
+ "data": {
+  "type": "FeatureCollection",
+  "features": [
+   {
+    "id": 38001,
+    "type": "Feature",
+    "geometry": {
+     "type": "Polygon",
+     "coordinates": [
+      [
+       [
+        4185612.854,
+        7508807.851
+       ],
+       [
+        4185668.514,
+        7508807.851
+       ],
+       [
+        4185668.514,
+        7508906.749
+       ],
+       [
+        4185612.854,
+        7508906.749
+       ],
+       [
+        4185612.854,
+        7508807.851
+       ]
+      ]
+     ],
+     "crs": {
+      "type": "name",
+      "properties": {
+       "name": "EPSG:3857"
+      }
+     }
+    },
+    "properties": {
+     "category": 36368,
+     "categoryName": "Земельные участки из ЕГРН",
+     "options": {
+      "land_record_type": "Земельный участок",
+      "land_record_subtype": "Землепользование",
+      "land_record_reg_date": "15.03.2005",
+      "cad_num": "50:20:0010101:123",
+      "quarter_cad_number": "50:20:0010101",
+      "readable_address": "Московская область, Одинцовский г.о., д. Дубки, уч. 5",
+      "specified_area": 1500.0,
+      "declared_area": null,
+      "area": null,
+      "status": "Учтенный",
+      "land_record_category_type": "Земли населенных пунктов",
+      "permitted_use_established_by_document": "Для индивидуального жилищного строительства",
+      "ownership_type": "Частная",
+      "cost_value": 2345678.9,
+      "cost_index": 1563.79
+     },
+     "systemInfo": {
+      "inserted": "2024-01-01T00:00:00",
+      "insertedBy": "nspd",
+      "updated": "2026-09-01T00:00:00",
+      "updatedBy": "nspd"
+     }
+    }
+   }
+  ]
+ },
+ "meta": [
+  {
+   "totalCount": 1,
+   "categoryId": 36368
+  }
+ ]
+}

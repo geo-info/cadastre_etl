@@ -1,0 +1,77 @@
+{
+ "data": {
+  "type": "FeatureCollection",
+  "features": [
+   {
+    "id": 38002,
+    "type": "Feature",
+    "geometry": {
+     "type": "MultiPolygon",
+     "coordinates": [
+      [
+       [
+        [
+         4186726.049,
+         7510786.046
+        ],
+        [
+         4186748.313,
+         7510786.046
+        ],
+        [
+         4186748.313,
+         7510825.615
+        ],
+        [
+         4186726.049,
+         7510825.615
+        ],
+        [
+         4186726.049,
+         7510786.046
+        ]
+       ]
+      ]
+     ],
+     "crs": {
+      "type": "name",
+      "properties": {
+       "name": "EPSG:3857"
+      }
+     }
+    },
+    "properties": {
+     "category": 36369,
+     "categoryName": "Здания",
+     "options": {
+      "build_record_type_value": "Здание",
+      "build_record_registration_date": "01.07.2012",
+      "cad_num": "77:03:0001001:3030",
+      "quarter_cad_number": "77:03:0001001",
+      "readable_address": "г. Москва, ул. Примерная, д. 1",
+      "building_name": "Жилой дом",
+      "purpose": "Многоквартирный дом",
+      "build_record_area": 5120.4,
+      "status": "Ранее учтенный",
+      "ownership_type": null,
+      "cost_value": 150000000.0,
+      "floors": "9",
+      "year_built": "1975"
+     },
+     "systemInfo": {
+      "inserted": "2024-01-01T00:00:00",
+      "insertedBy": "nspd",
+      "updated": "2026-09-01T00:00:00",
+      "updatedBy": "nspd"
+     }
+    }
+   }
+  ]
+ },
+ "meta": [
+  {
+   "totalCount": 1,
+   "categoryId": 36369
+  }
+ ]
+}

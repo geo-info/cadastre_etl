@@ -20,3 +20,41 @@ jobs:
       - run: uv sync --locked
       - run: uv run ruff check
       - run: uv run ruff format --check
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgis:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_USER: etl
+          POSTGRES_PASSWORD: etl
+          POSTGRES_DB: cadastre
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U etl -d cadastre"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      mongo:
+        image: mongo:8
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ping: 1}).ok'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      POSTGRES_DSN: postgresql://etl:etl@localhost:5432/cadastre
+      MONGO_URI: mongodb://localhost:27017
+      REQUIRE_POSTGRES: "1"
+      REQUIRE_MONGO: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run pytest -v

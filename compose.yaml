@@ -1,0 +1,48 @@
+# PostGIS для cadastre-etl: `docker compose up -d postgis`.
+#
+# Mongo здесь — только для локальной разработки, когда рядом нет Mongo
+# trading_platform: `docker compose --profile dev up -d`. В работе сервис читает
+# ту Mongo, куда пишет trading_platform (MONGO_URI).
+#
+# Порты открыты только на петлевом интерфейсе: иначе Docker пробивает правило в
+# iptables мимо хостового фаервола, и база с паролем etl/etl видна из сети.
+
+services:
+  postgis:
+    image: postgis/postgis:17-3.5
+    container_name: cadastre-postgis
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: etl
+      POSTGRES_PASSWORD: etl
+      POSTGRES_DB: cadastre
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "etl", "-d", "cadastre"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  mongo:
+    image: mongo:8
+    container_name: cadastre-mongo
+    profiles: ["dev"]
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  pg-data:
+  mongo-data:

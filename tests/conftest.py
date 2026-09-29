@@ -86,3 +86,12 @@ def pytest_collection_modifyitems(items):
             item.add_marker(pytest.mark.postgres)
         if "mongo_db" in names:
             item.add_marker(pytest.mark.mongo)
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--record",
+        action="store_true",
+        default=False,
+        help="живые тесты НСПД: записать ответы в tests/fixtures/nspd/recorded/",
+    )

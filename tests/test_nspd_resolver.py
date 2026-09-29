@@ -3,49 +3,21 @@
 from __future__ import annotations
 
 import asyncio
-import json
-from pathlib import Path
 
 import httpx
 import pytest
 from pynspd.errors import BlockedIP, PynspdServerError
 
 from cadastre_etl.conf import NspdSettings
-from cadastre_etl.nspd.client import RawAnswer
 from cadastre_etl.nspd.resolver import BACKOFF_CAP, Resolver, backoff
+from tests.fakes import FakeNspd, fixture_answer, http_error
 
-FIXTURES = Path(__file__).parent / "fixtures" / "nspd"
-LAND = RawAnswer(200, json.loads((FIXTURES / "land_plot.json").read_text(encoding="utf-8")), False)
+LAND = fixture_answer("land_plot")
 CN = "50:20:0010101:123"
 
 
-def http_error(cls, status):
-    return cls(httpx.Response(status, json={"message": "x"}))
-
-
-class FakeClient:
-    """Ответы по номерам: список — по очереди на каждую попытку; всё остальное — пусто."""
-
-    def __init__(self, script=None, delay: float = 0.0):
-        self.script = {k: list(v) for k, v in (script or {}).items()}
-        self.calls: list[str] = []
-        self.delay = delay
-        self.active = 0
-        self.max_active = 0
-
-    async def search(self, cad_num):
-        self.calls.append(cad_num)
-        self.active += 1
-        self.max_active = max(self.max_active, self.active)
-        try:
-            await asyncio.sleep(self.delay)
-            queue = self.script.get(cad_num)
-            item = queue.pop(0) if queue else RawAnswer(404, None, False)
-            if isinstance(item, Exception):
-                raise item
-            return item
-        finally:
-            self.active -= 1
+def FakeClient(script=None, delay: float = 0.0):
+    return FakeNspd(script, delay, default=None)
 
 
 def conf(**overrides) -> NspdSettings:

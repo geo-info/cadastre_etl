@@ -48,14 +48,19 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="cadastre_etl", description="Кадастровые объекты лотов: Mongo → НСПД → PostGIS."
     )
+    # -v понимается и до команды, и после неё: `-v run` и `run -v`.
+    verbose = argparse.ArgumentParser(add_help=False)
+    verbose.add_argument(
+        "-v", "--verbose", action="store_true", default=argparse.SUPPRESS, help="подробный журнал (DEBUG)"
+    )
     parser.add_argument("-v", "--verbose", action="store_true", help="подробный журнал (DEBUG)")
     commands = parser.add_subparsers(dest="command", required=True)
-    run = commands.add_parser("run", help="прогон площадок")
+    run = commands.add_parser("run", help="прогон площадок", parents=[verbose])
     run.add_argument("sources", nargs="*", help="имена площадок (коллекций); без имён — все")
     run.add_argument("--loop", action="store_true", help="повторять с паузой INTERVAL")
-    commands.add_parser("migrate", help="применить миграции PostGIS")
-    commands.add_parser("status", help="состояние площадок из etl_state")
-    commands.add_parser("sources", help="коллекции Mongo и их состояние")
+    commands.add_parser("migrate", help="применить миграции PostGIS", parents=[verbose])
+    commands.add_parser("status", help="состояние площадок из etl_state", parents=[verbose])
+    commands.add_parser("sources", help="коллекции Mongo и их состояние", parents=[verbose])
     return parser
 
 

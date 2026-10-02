@@ -154,5 +154,8 @@ def test_адреса_в_журнале_без_пароля():
 
 
 def test_ключ_подробного_журнала():
-    args = cli.build_parser().parse_args(["-v", "run"])
-    assert args.verbose and args.command == "run"
+    parser = cli.build_parser()
+    assert parser.parse_args(["-v", "run"]).verbose
+    assert parser.parse_args(["run", "-v", "bep"]).verbose
+    assert parser.parse_args(["status", "--verbose"]).verbose
+    assert not parser.parse_args(["run"]).verbose

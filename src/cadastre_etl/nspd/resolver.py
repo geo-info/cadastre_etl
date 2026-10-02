@@ -81,6 +81,18 @@ class Resolver:
         self.breaker_open = False
         #: Сколько запросов ушло в ``client.search`` (включая попадания в кэш).
         self.requests = 0
+        #: Из них ответов из кэша pynspd и неудачных запросов — для журнала хода.
+        self.cache_hits = 0
+        self.failures = 0
+
+    @property
+    def waiting(self) -> int:
+        """Номеров, ждущих ответа (в очереди лимитера или в запросе)."""
+        return sum(not task.done() for task in self._tasks.values())
+
+    @property
+    def resolved(self) -> int:
+        return sum(task.done() for task in self._tasks.values())
 
     async def resolve(self, cad_num: str) -> Resolved:
         task = self._tasks.get(cad_num)
@@ -124,10 +136,13 @@ class Resolver:
                 self._failed(cad_num, error)
                 return Outcome(cad_num, "error", error=_describe(error))
             self._failures_in_row = 0
+            if raw.from_cache:
+                self.cache_hits += 1
             return parse_answer(cad_num, raw)
 
     def _failed(self, cad_num: str, error: Exception) -> None:
         self._failures_in_row += 1
+        self.failures += 1
         log.debug("%s: %s", cad_num, _describe(error))
         if not self.breaker_open and self._failures_in_row >= self._breaker_limit:
             self.breaker_open = True

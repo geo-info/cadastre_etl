@@ -16,6 +16,7 @@ trading_platform дописывает позже листинга, не трог
 
 from __future__ import annotations
 
+import re
 from collections.abc import AsyncIterator
 from datetime import datetime
 from typing import Any
@@ -48,9 +49,18 @@ LOT_FIELDS = (
 )
 
 
+#: Сколько ждать сервер Mongo, мс. По умолчанию pymongo ждёт 30 с — молча.
+SERVER_SELECTION_TIMEOUT_MS = 10_000
+
+
 def create_client(uri: str) -> AsyncMongoClient:
     """Клиент Mongo; соединение открывается лениво, на первом запросе."""
-    return AsyncMongoClient(uri, tz_aware=True)
+    return AsyncMongoClient(uri, tz_aware=True, serverSelectionTimeoutMS=SERVER_SELECTION_TIMEOUT_MS)
+
+
+def describe_uri(uri: str) -> str:
+    """Адрес Mongo для журнала — без пользователя и пароля."""
+    return re.sub(r"//[^@/]*@", "//", uri)
 
 
 async def list_sources(db: AsyncDatabase, exclude: list[str] | tuple[str, ...] = ()) -> list[str]:

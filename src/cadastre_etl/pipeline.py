@@ -13,6 +13,12 @@
 Ошибки НСПД площадку не роняют: номер остаётся в очереди повторов
 (``pending``/``error``), а она разбирается в начале следующего прогона — даже
 если лот больше не изменится.
+
+Журнал (INFO) — чтобы по нему было видно, что прогон идёт, а не висит: куда
+подключились, сколько площадок, по каждой — граница, каждая пачка и итог, и
+раз в ``PROGRESS_EVERY`` секунд — пульс: сколько номеров спрошено у НСПД, сколько
+ждут и сколько площадок готово. Первый прогон по всем площадкам при 2 запросах в
+секунду может идти часами — пульс это показывает.
 """
 
 from __future__ import annotations
@@ -33,10 +39,10 @@ from cadastre_etl.conf import Settings
 from cadastre_etl.db.lots import write_lots
 from cadastre_etl.db.migrate import apply_migrations
 from cadastre_etl.db.objects import due_for_retry, write_outcomes
-from cadastre_etl.db.pool import connect, open_pool
+from cadastre_etl.db.pool import connect, describe_dsn, open_pool
 from cadastre_etl.db.state import get_checked_at, save_failure, save_success, source_lock
 from cadastre_etl.extract import extract_lot
-from cadastre_etl.mongo import changed_lots, create_client, list_sources
+from cadastre_etl.mongo import changed_lots, create_client, describe_uri, list_sources
 from cadastre_etl.nspd.client import NspdClient
 from cadastre_etl.nspd.resolver import Resolved, Resolver, Searcher
 from cadastre_etl.stats import SourceStats
@@ -44,6 +50,8 @@ from cadastre_etl.stats import SourceStats
 log = logging.getLogger(__name__)
 
 RETRY_QUEUE = "(повторы)"
+#: Как часто писать в журнал пульс прогона, с.
+PROGRESS_EVERY = 15.0
 
 
 class UnknownSources(ValueError):
@@ -116,7 +124,25 @@ async def _process_batch(
     new = sorted((written.numbers or set()) - counted)
     counted.update(new)
     stats.numbers = len(counted)
+    log.info(
+        "%s: пачка из %d лотов, с номерами %d; новых номеров %d — спрашиваю НСПД",
+        source,
+        len(batch),
+        written.lots,
+        len(new),
+    )
     await resolve_and_write(ctx, new, stats)
+    log.info(
+        "%s: прочитано лотов %d, номеров %d (из сети %d, из кэша %d, не найдено %d, ошибок %d, отложено %d)",
+        source,
+        stats.lots,
+        stats.numbers,
+        stats.fetched,
+        stats.cached,
+        stats.not_found,
+        stats.errors,
+        stats.deferred,
+    )
 
 
 def _initial_since(settings: Settings) -> datetime | None:
@@ -156,6 +182,10 @@ async def run_source(ctx: Context, source: str) -> SourceStats:
     finally:
         await lock_conn.close()
         stats.seconds = time.monotonic() - started
+    if stats.status == "ok":
+        log.info(
+            "%s: готово за %.0f с — лотов %d, номеров %d", source, stats.seconds, stats.lots, stats.numbers
+        )
     return stats
 
 
@@ -163,7 +193,9 @@ async def _run_locked(ctx: Context, source: str, run_started: datetime, stats: S
     async with ctx.pool.connection() as conn:
         checked_at = await get_checked_at(conn, source)
     since = checked_at - ctx.settings.etl.overlap if checked_at else _initial_since(ctx.settings)
-    log.info("%s: лоты после %s", source, since.isoformat() if since else "начала")
+    log.info(
+        "%s: начало, читаю лоты после %s", source, since.isoformat() if since else "начала (первый прогон)"
+    )
 
     batch_size = ctx.settings.etl.batch_size
     counted: set[str] = set()
@@ -189,6 +221,8 @@ async def run_retry_queue(ctx: Context) -> SourceStats:
         async with ctx.pool.connection() as conn:
             numbers = await due_for_retry(conn, ctx.settings.nspd.retry_limit)
         stats.numbers = len(numbers)
+        if numbers:
+            log.info("очередь повторов: %d номеров с прошлых прогонов", len(numbers))
         await resolve_and_write(ctx, numbers, stats)
     except asyncio.CancelledError:
         raise
@@ -207,12 +241,15 @@ async def run_all(
 
     ``nspd`` — подменить клиент НСПД (тесты); по умолчанию — ``NspdClient`` из настроек.
     """
+    log.info("PostGIS: подключение к %s", describe_dsn(settings.postgres.dsn))
     conn = await connect(settings.postgres.dsn)
     try:
-        await apply_migrations(conn)
+        applied = await apply_migrations(conn)
     finally:
         await conn.close()
+    log.info("PostGIS: %s", "применены миграции " + ", ".join(applied) if applied else "схема актуальна")
 
+    log.info("Mongo: подключение к %s, база %s", describe_uri(settings.mongo.uri), settings.mongo.db)
     mongo_client = create_client(settings.mongo.uri)
     try:
         db = mongo_client[settings.mongo.db]
@@ -222,6 +259,19 @@ async def run_all(
             if unknown:
                 raise UnknownSources(f"нет таких площадок в {settings.mongo.db}: {', '.join(unknown)}")
         targets = list(dict.fromkeys(names)) if names else available
+        log.info(
+            "площадок: %d (%s), одновременно до %d",
+            len(targets),
+            ", ".join(targets) or "нет коллекций",
+            settings.etl.source_concurrency,
+        )
+        log.info(
+            "НСПД: кэш %s, срок %s; не чаще %g запросов/с, одновременно до %d",
+            _describe_cache(settings),
+            settings.nspd.cache_ttl,
+            settings.nspd.rate,
+            settings.nspd.concurrency,
+        )
 
         own_client = nspd is None
         client: Any = await NspdClient.create(settings.nspd) if own_client else nspd
@@ -237,7 +287,18 @@ async def run_all(
                     async with semaphore:
                         return await run_source(ctx, source)
 
-                result.sources = list(await asyncio.gather(*(guarded(s) for s in targets)))
+                done: list[SourceStats] = []
+
+                async def tracked(source: str) -> SourceStats:
+                    stats = await guarded(source)
+                    done.append(stats)
+                    return stats
+
+                pulse = asyncio.create_task(_pulse(resolver, done, len(targets)))
+                try:
+                    result.sources = list(await asyncio.gather(*(tracked(s) for s in targets)))
+                finally:
+                    pulse.cancel()
                 result.breaker_open = resolver.breaker_open
                 return result
         finally:
@@ -246,3 +307,30 @@ async def run_all(
                 await client.close()
     finally:
         await mongo_client.close()
+
+
+def _describe_cache(settings: Settings) -> str:
+    match settings.nspd.cache:
+        case "sqlite":
+            return f"sqlite {settings.nspd.cache_path}"
+        case "redis":
+            return f"redis {describe_uri(settings.nspd.redis_url)}"
+        case _:
+            return "выключен"
+
+
+async def _pulse(resolver: Resolver, done: list[SourceStats], total: int) -> None:
+    """Раз в ``PROGRESS_EVERY`` секунд — строка о ходе прогона."""
+    while True:
+        await asyncio.sleep(PROGRESS_EVERY)
+        log.info(
+            "идёт прогон: площадок готово %d из %d; НСПД — запросов %d (из кэша %d, неудачных %d), "
+            "ждут ответа %d номеров%s",
+            len(done),
+            total,
+            resolver.requests,
+            resolver.cache_hits,
+            resolver.failures,
+            resolver.waiting,
+            "; НСПД недоступна, предохранитель" if resolver.breaker_open else "",
+        )

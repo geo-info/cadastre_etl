@@ -13,7 +13,12 @@
 ``--loop`` ошибка прогона цикл не останавливает; SIGTERM/SIGINT отменяют текущий
 прогон (его состояние не двигается) и завершают цикл с кодом последнего прогона.
 
-Таблица — в stdout, журнал — в stderr (уровень ``LOG_LEVEL``).
+Таблица — в stdout, журнал хода — в stderr (уровень ``LOG_LEVEL``, ``-v`` —
+подробно, вплоть до каждого HTTP-запроса).
+
+Windows: асинхронный psycopg не работает с циклом событий по умолчанию
+(``ProactorEventLoop``), поэтому там запускаем ``SelectorEventLoop``; сигналы —
+через ``signal.signal``, ``add_signal_handler`` в Windows нет.
 """
 
 from __future__ import annotations
@@ -23,7 +28,8 @@ import asyncio
 import logging
 import signal
 import sys
-from collections.abc import Sequence
+from collections.abc import Callable, Coroutine, Sequence
+from typing import Any
 
 from cadastre_etl import pipeline
 from cadastre_etl.conf import Settings, get_settings
@@ -42,6 +48,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="cadastre_etl", description="Кадастровые объекты лотов: Mongo → НСПД → PostGIS."
     )
+    parser.add_argument("-v", "--verbose", action="store_true", help="подробный журнал (DEBUG)")
     commands = parser.add_subparsers(dest="command", required=True)
     run = commands.add_parser("run", help="прогон площадок")
     run.add_argument("sources", nargs="*", help="имена площадок (коллекций); без имён — все")
@@ -65,11 +72,22 @@ async def run_once(settings: Settings, names: Sequence[str]) -> int:
     return result.exit_code
 
 
+def _on_stop_signals(stop: asyncio.Event) -> Callable[[], None]:
+    """SIGTERM/SIGINT → ``stop``; вернуть функцию, снимающую обработчики."""
+    loop = asyncio.get_running_loop()
+    sigs = (signal.SIGTERM, signal.SIGINT)
+    try:
+        for sig in sigs:
+            loop.add_signal_handler(sig, stop.set)
+    except NotImplementedError:  # Windows
+        previous = {sig: signal.signal(sig, lambda *_: loop.call_soon_threadsafe(stop.set)) for sig in sigs}
+        return lambda: [signal.signal(sig, handler) for sig, handler in previous.items()] and None
+    return lambda: [loop.remove_signal_handler(sig) for sig in sigs] and None
+
+
 async def run_loop(settings: Settings, names: Sequence[str]) -> int:
     stop = asyncio.Event()
-    loop = asyncio.get_running_loop()
-    for sig in (signal.SIGTERM, signal.SIGINT):
-        loop.add_signal_handler(sig, stop.set)
+    restore = _on_stop_signals(stop)
     code = 0
     try:
         while not stop.is_set():
@@ -92,8 +110,7 @@ async def run_loop(settings: Settings, names: Sequence[str]) -> int:
             except TimeoutError:
                 pass
     finally:
-        for sig in (signal.SIGTERM, signal.SIGINT):
-            loop.remove_signal_handler(sig)
+        restore()
     return code
 
 
@@ -126,11 +143,18 @@ async def status(settings: Settings, with_sources: bool) -> int:
     return 0
 
 
+def run_async(coro: Coroutine[Any, Any, int]) -> int:
+    """``asyncio.run`` с циклом, который понимает psycopg, и в Windows тоже."""
+    if sys.platform == "win32":
+        return asyncio.run(coro, loop_factory=asyncio.SelectorEventLoop)
+    return asyncio.run(coro)
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     settings = get_settings()
     logging.basicConfig(
-        level=settings.etl.log_level.upper(),
+        level="DEBUG" if args.verbose else settings.etl.log_level.upper(),
         stream=sys.stderr,
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     )
@@ -139,11 +163,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         logging.getLogger("httpx").setLevel(logging.WARNING)
     if args.command == "run":
         runner = run_loop if args.loop else run_once
-        return asyncio.run(runner(settings, args.sources))
+        log.info("старт: %s", "цикл, пауза " + str(settings.etl.interval) if args.loop else "один прогон")
+        try:
+            return run_async(runner(settings, args.sources))
+        except KeyboardInterrupt:
+            log.warning("прервано")
+            return 130
     try:
         if args.command == "migrate":
-            return asyncio.run(migrate(settings))
-        return asyncio.run(status(settings, with_sources=args.command == "sources"))
+            return run_async(migrate(settings))
+        return run_async(status(settings, with_sources=args.command == "sources"))
     except Exception as error:
         log.error("%s: %s", type(error).__name__, error)
         return 1

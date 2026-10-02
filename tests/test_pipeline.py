@@ -184,3 +184,22 @@ async def test_первый_прогон_с_даты(settings, mongo_db):
     )
     result = await run_all(settings(initial_since=date(2026, 1, 1)), nspd=FakeNspd())
     assert result.sources[0].lots == 1
+
+
+async def test_журнал_хода(settings, mongo_db, caplog, monkeypatch):
+    """По журналу видно, что прогон идёт: подключения, пачки, пульс, итог площадки."""
+    import cadastre_etl.pipeline as pipeline_module
+
+    monkeypatch.setattr(pipeline_module, "PROGRESS_EVERY", 0.01)
+    await mongo_db.bep.insert_many([lot(str(n), f"ЗУ 50:20:0010101:{n}", HOUR_AGO) for n in range(3)])
+    with caplog.at_level("INFO", logger="cadastre_etl"):
+        await run_all(settings(), nspd=FakeNspd(delay=0.03))
+    text = caplog.text
+    assert "PostGIS: подключение к localhost:5432/cadastre_test_" in text
+    assert "etl:etl" not in text
+    assert "площадок: 1 (bep)" in text
+    assert "bep: начало, читаю лоты после начала (первый прогон)" in text
+    assert "bep: пачка из 2 лотов, с номерами 2; новых номеров 2 — спрашиваю НСПД" in text
+    assert "bep: прочитано лотов 3, номеров 3 (из сети 3," in text
+    assert "идёт прогон: площадок готово 0 из 1; НСПД — запросов" in text
+    assert "bep: готово за" in text

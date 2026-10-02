@@ -122,3 +122,37 @@ async def test_сигнал_отменяет_текущий_прогон(monkeyp
 def test_разбор_аргументов():
     args = cli.build_parser().parse_args(["run", "bep", "seltim", "--loop"])
     assert (args.command, args.sources, args.loop) == ("run", ["bep", "seltim"], True)
+
+
+def test_в_windows_цикл_для_psycopg(monkeypatch):
+    seen = {}
+
+    def fake_run(coro, **kwargs):
+        seen.update(kwargs)
+        coro.close()
+        return 0
+
+    monkeypatch.setattr(cli.sys, "platform", "win32")
+    monkeypatch.setattr(cli.asyncio, "run", fake_run)
+
+    async def job():
+        return 0
+
+    assert cli.run_async(job()) == 0
+    assert seen == {"loop_factory": asyncio.SelectorEventLoop}
+
+
+def test_адреса_в_журнале_без_пароля():
+    from cadastre_etl.db.pool import describe_dsn
+    from cadastre_etl.mongo import describe_uri
+
+    assert describe_dsn("postgresql://etl:secret@db:5433/cadastre") == "db:5433/cadastre"
+    assert (
+        describe_uri("mongodb://user:secret@mongo:27017/?authSource=admin")
+        == "mongodb://mongo:27017/?authSource=admin"
+    )
+
+
+def test_ключ_подробного_журнала():
+    args = cli.build_parser().parse_args(["-v", "run"])
+    assert args.verbose and args.command == "run"

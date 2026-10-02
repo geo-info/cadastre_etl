@@ -64,6 +64,8 @@ class Context:
     pool: AsyncConnectionPool
     mongo: AsyncDatabase
     resolver: Resolver
+    #: Перечитать все лоты, не глядя на ``checked_at`` (``run --full``).
+    full: bool = False
 
 
 @dataclass
@@ -192,9 +194,18 @@ async def run_source(ctx: Context, source: str) -> SourceStats:
 async def _run_locked(ctx: Context, source: str, run_started: datetime, stats: SourceStats) -> None:
     async with ctx.pool.connection() as conn:
         checked_at = await get_checked_at(conn, source)
-    since = checked_at - ctx.settings.etl.overlap if checked_at else _initial_since(ctx.settings)
+    if checked_at and not ctx.full:
+        since = checked_at - ctx.settings.etl.overlap
+    else:
+        since = _initial_since(ctx.settings)
     log.info(
-        "%s: начало, читаю лоты после %s", source, since.isoformat() if since else "начала (первый прогон)"
+        "%s: начало, читаю лоты после %s",
+        source,
+        since.isoformat()
+        if since
+        else "начала (полное перечитывание)"
+        if ctx.full
+        else "начала (первый прогон)",
     )
 
     batch_size = ctx.settings.etl.batch_size
@@ -235,11 +246,18 @@ async def run_retry_queue(ctx: Context) -> SourceStats:
 
 
 async def run_all(
-    settings: Settings, names: Sequence[str] | None = None, *, nspd: Searcher | None = None
+    settings: Settings,
+    names: Sequence[str] | None = None,
+    *,
+    nspd: Searcher | None = None,
+    full: bool = False,
 ) -> RunResult:
     """Один прогон: миграции, очередь повторов, площадки ``names`` (или все).
 
-    ``nspd`` — подменить клиент НСПД (тесты); по умолчанию — ``NspdClient`` из настроек.
+    ``full`` — перечитать все лоты площадок (с ``INITIAL_SINCE``), а не только
+    изменившиеся: нужно, когда в ``lots`` добавились колонки. Граница после прогона
+    ставится как обычно. ``nspd`` — подменить клиент НСПД (тесты); по умолчанию —
+    ``NspdClient`` из настроек.
     """
     log.info("PostGIS: подключение к %s", describe_dsn(settings.postgres.dsn))
     conn = await connect(settings.postgres.dsn)
@@ -278,7 +296,7 @@ async def run_all(
         resolver = Resolver(client, settings.nspd)
         try:
             async with open_pool(settings.postgres.dsn, max_size=settings.etl.source_concurrency + 2) as pool:
-                ctx = Context(settings, pool, db, resolver)
+                ctx = Context(settings, pool, db, resolver, full=full)
                 result = RunResult()
                 result.retry = await run_retry_queue(ctx)
                 semaphore = asyncio.Semaphore(settings.etl.source_concurrency)

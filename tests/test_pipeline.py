@@ -203,3 +203,30 @@ async def test_журнал_хода(settings, mongo_db, caplog, monkeypatch):
     assert "bep: прочитано лотов 3, номеров 3 (из сети 3," in text
     assert "идёт прогон: площадок готово 0 из 1; НСПД — запросов" in text
     assert "bep: готово за" in text
+
+
+async def test_поля_торгов_и_полное_перечитывание(settings, mongo_db, pg_dsn):
+    """Лот, загруженный раньше, получает новые поля при ``run --full``."""
+    await mongo_db.bep.insert_one(lot("1", "ЗУ 50:20:0010101:1", HOUR_AGO))
+    await run_all(settings(), nspd=FakeNspd())
+    await mongo_db.bep.update_one(
+        {"lot_id": "1"},
+        {
+            "$set": {
+                "trade_id": "10840",
+                "trade_type": "ОАОФ",
+                "auction_name": "Открытый аукцион",
+                "winner": "ООО «Ромашка»",
+                "bids_end": "01.10.2026 10:00",
+                "auction_date": "02.10.2026",
+            }
+        },
+    )
+    assert (await run_all(settings(), nspd=FakeNspd())).sources[0].lots == 0
+
+    result = await run_all(settings(), nspd=FakeNspd(), full=True)
+    assert result.sources[0].lots == 1
+    assert await query(
+        pg_dsn,
+        "SELECT trade_id, trade_type, auction_name, winner, bids_end, auction_date FROM lot_objects",
+    ) == [("10840", "ОАОФ", "Открытый аукцион", "ООО «Ромашка»", "01.10.2026 10:00", "02.10.2026")]

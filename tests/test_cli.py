@@ -72,7 +72,7 @@ def settings() -> Settings:
 
 
 async def test_неизвестная_площадка_код_2(monkeypatch):
-    async def fake_run_all(settings, names):
+    async def fake_run_all(settings, names, full=False):
         raise pipeline.UnknownSources("нет таких площадок: nope")
 
     monkeypatch.setattr(pipeline, "run_all", fake_run_all)
@@ -80,7 +80,7 @@ async def test_неизвестная_площадка_код_2(monkeypatch):
 
 
 async def test_недоступная_база_код_1(monkeypatch):
-    async def fake_run_all(settings, names):
+    async def fake_run_all(settings, names, full=False):
         raise OSError("connection refused")
 
     monkeypatch.setattr(pipeline, "run_all", fake_run_all)
@@ -90,7 +90,7 @@ async def test_недоступная_база_код_1(monkeypatch):
 async def test_цикл_до_сигнала(monkeypatch, capsys):
     calls = []
 
-    async def fake_run_all(settings, names):
+    async def fake_run_all(settings, names, full=False):
         calls.append(names)
         if len(calls) == 2:
             os.kill(os.getpid(), signal.SIGTERM)
@@ -106,7 +106,7 @@ async def test_цикл_до_сигнала(monkeypatch, capsys):
 async def test_сигнал_отменяет_текущий_прогон(monkeypatch):
     cancelled = asyncio.Event()
 
-    async def slow_run_all(settings, names):
+    async def slow_run_all(settings, names, full=False):
         asyncio.get_running_loop().call_later(0.01, os.kill, os.getpid(), signal.SIGTERM)
         try:
             await asyncio.sleep(10)
@@ -159,3 +159,18 @@ def test_ключ_подробного_журнала():
     assert parser.parse_args(["run", "-v", "bep"]).verbose
     assert parser.parse_args(["status", "--verbose"]).verbose
     assert not parser.parse_args(["run"]).verbose
+
+
+async def test_полный_прогон_только_первый_в_цикле(monkeypatch):
+    seen = []
+
+    async def fake_run_all(settings, names, full=False):
+        seen.append(full)
+        if len(seen) == 2:
+            os.kill(os.getpid(), signal.SIGTERM)
+        return RunResult(sources=[SourceStats("bep")])
+
+    monkeypatch.setattr(pipeline, "run_all", fake_run_all)
+    await cli.run_loop(settings(), [], full=True)
+    assert seen == [True, False]
+    assert cli.build_parser().parse_args(["run", "--full"]).full

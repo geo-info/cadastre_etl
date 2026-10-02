@@ -50,7 +50,7 @@ async def test_параллельные_миграции_не_мешают_др�
     finally:
         await first.close()
         await second.close()
-    assert sorted(results, key=len) == [[], ["0001_init"]]
+    assert sorted(results, key=len) == [[], [version for version, _ in migration_files()]]
 
 
 async def test_геометрия_только_в_4326(pool):

@@ -32,6 +32,7 @@ Mongo — та, куда пишет trading_platform (по умолчанию `m
 uv run python -m cadastre_etl run                 # все площадки, один прогон
 uv run python -m cadastre_etl run bep seltim      # только эти
 uv run python -m cadastre_etl run --loop          # прогон, пауза INTERVAL, снова
+uv run python -m cadastre_etl run --full          # перечитать все лоты, а не только изменившиеся
 uv run python -m cadastre_etl status              # etl_state таблицей
 uv run python -m cadastre_etl sources             # коллекции Mongo и их состояние
 uv run python -m cadastre_etl migrate             # только миграции (run делает их сам)
@@ -65,6 +66,11 @@ utender        0        0        0        0           0       0         0  faile
 
 В режиме `--loop` ошибка прогона цикл не останавливает; SIGTERM/SIGINT отменяют
 текущий прогон (его состояние не сдвигается) и завершают процесс.
+
+`--full` нужен, когда в `lots` добавились колонки (например, миграция `0002` с
+типом торгов): обычный прогон читает только изменившиеся лоты, и у загруженных раньше
+новые поля остались бы пустыми. Ответы НСПД при этом берутся из кэша, но лимит
+частоты тратится — тысяча номеров займёт около 8 минут.
 
 ### Журнал: идёт или висит
 
@@ -169,7 +175,7 @@ pynspd 1.1.15 бросает `ValueError`.)
 
 | таблица | что |
 |---|---|
-| `lots` | лоты с хотя бы одним номером или кварталом: ссылки, описание, статус, цена, сроки, должник, организатор, `cad_quarters`, отметки времени Mongo |
+| `lots` | лоты с хотя бы одним номером или кварталом: ссылки, номер и тип торгов (`trade_id`, `trade_number`, `trade_type`, `auction_name`), номер лота, описание, статус, цена строкой и числом, сроки строкой (`bids_end`, `auction_date`) и датой (`bids_end_at`, `auction_at`), должник, организатор, победитель, `cad_quarters`, отметки времени Mongo |
 | `cadastral_objects` | `cad_num` PK, `status`, вид (`kind`, `kind_label`), категория НСПД, ключевые поля (адрес, площадь, категория земель, ВРИ, кадастровая стоимость, статус в ЕГРН, дата постановки, квартал, форма собственности), `attrs jsonb`, `geom geometry(Geometry, 4326)` + GIST, `geom_approx` (точка геокодера), `fetched_at`, счётчик и текст ошибок |
 | `lot_cadastral` | связь `(source, lot_id, cad_num)`, `found_in` — где в лоте нашёлся номер |
 | `etl_state` | `checked_at` и итог последнего прогона площадки |

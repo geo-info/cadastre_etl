@@ -33,6 +33,12 @@ class LotRow:
     trade_url: str | None
     trade_number: str | None
     lot_num: str | None
+    trade_id: str | None
+    trade_type: str | None
+    auction_name: str | None
+    winner: str | None
+    bids_end: str | None
+    auction_date: str | None
     description: str | None
     status: str | None
     is_active: bool | None
@@ -62,6 +68,12 @@ class LotRow:
             trade_url=text("trade_url"),
             trade_number=text("trade_number"),
             lot_num=text("lot_num"),
+            trade_id=text("trade_id"),
+            trade_type=text("trade_type"),
+            auction_name=text("auction_name"),
+            winner=text("winner"),
+            bids_end=text("bids_end"),
+            auction_date=text("auction_date"),
             description=text("description"),
             status=text("status"),
             is_active=is_active if isinstance(is_active, bool) else None,

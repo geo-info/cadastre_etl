@@ -58,15 +58,20 @@ def build_parser() -> argparse.ArgumentParser:
     run = commands.add_parser("run", help="прогон площадок", parents=[verbose])
     run.add_argument("sources", nargs="*", help="имена площадок (коллекций); без имён — все")
     run.add_argument("--loop", action="store_true", help="повторять с паузой INTERVAL")
+    run.add_argument(
+        "--full",
+        action="store_true",
+        help="перечитать все лоты, а не только изменившиеся (в цикле — только первый прогон)",
+    )
     commands.add_parser("migrate", help="применить миграции PostGIS", parents=[verbose])
     commands.add_parser("status", help="состояние площадок из etl_state", parents=[verbose])
     commands.add_parser("sources", help="коллекции Mongo и их состояние", parents=[verbose])
     return parser
 
 
-async def run_once(settings: Settings, names: Sequence[str]) -> int:
+async def run_once(settings: Settings, names: Sequence[str], full: bool = False) -> int:
     try:
-        result = await pipeline.run_all(settings, names or None)
+        result = await pipeline.run_all(settings, names or None, full=full)
     except pipeline.UnknownSources as error:
         log.error("%s", error)
         return EXIT_USAGE
@@ -90,13 +95,14 @@ def _on_stop_signals(stop: asyncio.Event) -> Callable[[], None]:
     return lambda: [loop.remove_signal_handler(sig) for sig in sigs] and None
 
 
-async def run_loop(settings: Settings, names: Sequence[str]) -> int:
+async def run_loop(settings: Settings, names: Sequence[str], full: bool = False) -> int:
     stop = asyncio.Event()
     restore = _on_stop_signals(stop)
     code = 0
     try:
         while not stop.is_set():
-            current = asyncio.create_task(run_once(settings, names))
+            current = asyncio.create_task(run_once(settings, names, full))
+            full = False
             stopping = asyncio.create_task(stop.wait())
             await asyncio.wait({current, stopping}, return_when=asyncio.FIRST_COMPLETED)
             stopping.cancel()
@@ -170,7 +176,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         runner = run_loop if args.loop else run_once
         log.info("старт: %s", "цикл, пауза " + str(settings.etl.interval) if args.loop else "один прогон")
         try:
-            return run_async(runner(settings, args.sources))
+            return run_async(runner(settings, args.sources, args.full))
         except KeyboardInterrupt:
             log.warning("прервано")
             return 130
